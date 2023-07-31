@@ -17,3 +17,16 @@ create function users.getUser(@userid bigint)
 returns TABLE
 AS
 return (SELECT * FROM users.customers WHERE id=@userid)
+
+-----------------------------------------------------------------------------------------------------------------------
+create function products.getProductsByName(@name varchar(100))
+returns TABLE
+AS
+return (
+select p.name as product_name, p.id as product_id, p.description as description, p.list_price as list_price, p.sale_price as sale_price, p.in_store as in_store,
+b.name as brand_name, c.name as category_name, s.name as shop_seller_name
+from (((products.items p JOIN products.brands b on p.brand = b.id)
+JOIN products.categories c on p.category =  c.id)
+JOIN stores.retailers s on p.retailer = s.id)
+where p.name LIKE CONCAT('%',@name,'%')
+)

@@ -44,6 +44,8 @@ CREATE TABLE products.items(
     [retailer] bigint CONSTRAINT fk_stores_retailers REFERENCES stores.retailers(id) NOT NULL,
     [category] bigint CONSTRAINT fk_categories REFERENCES products.categories(id) NOT NULL,
     [brand] bigint CONSTRAINT fk_brands REFERENCES products.brands(id) NOT NULL,
-    [price] numeric(10,2) not null,
+    [list_price] numeric(10,2) not null,
+    [sale_price] numeric(10,2),
+    [image_store_url] sql_variant,
     [description] varchar(2000) not null
 )
