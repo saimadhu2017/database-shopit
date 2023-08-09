@@ -49,3 +49,11 @@ CREATE TABLE products.items(
     [image_store_url] sql_variant,
     [description] varchar(2000) not null
 )
+
+-----------------------------------------------------------------------------------------------------------
+CREATE TABLE users.customers_cart(
+    [product_id] bigint CONSTRAINT fk_product_id REFERENCES products.items(id) NOT NULL,
+    [user_id] bigint constraint fk_user_id REFERENCES users.customers(id) NOT NULL,
+    [quantity] int constraint chk_quantity CHECK([quantity]>=0) not null,
+    Constraint pk_customers_cart Primary Key (product_id, user_id)
+)
