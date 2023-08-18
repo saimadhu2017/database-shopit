@@ -38,7 +38,14 @@ Begin
    End
   else
    Begin
-    update users.customers_cart set quantity=@quantity where product_id=@product_id and user_id=@user_id
+    if(@quantity=0)
+     Begin
+	  delete from users.customers_cart where product_id=@product_id and user_id=@user_id
+	 End
+    else
+     Begin
+      update users.customers_cart set quantity=@quantity where product_id=@product_id and user_id=@user_id
+	 End
    End
   SELECT 1 as isCreated;
  End Try
