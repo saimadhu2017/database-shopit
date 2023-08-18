@@ -1,11 +1,23 @@
 create function users.checkMailPresent(@mail varchar(100))
-returns @OUTPUT table(encry_password varchar(200), salt varchar(200), isMailPresent int, id bigint)
+returns @OUTPUT table(encry_password varchar(200), salt varchar(200), isMailPresent int, id bigint, quantity int)
 AS
 BEGIN
  if exists (select * from users.customers where mail=@mail)
   BEGIN
+
+   declare @OUTPUT1 table(encry_password varchar(200), salt varchar(200), isMailPresent int, id bigint);
+   declare @user_id bigint;
+   
+   insert @OUTPUT1
+   select encry_password, salt, 1 as isMailPresent, id from [users].[customers] where mail=@mail;
+
+   select @user_id=id from @OUTPUT1;
+
+   declare @total_quantity int = 0
+   SELECT @total_quantity=SUM(quantity) FROM [users].[customers_cart] group by user_id having user_id=@user_id
+
    insert @OUTPUT
-   select encry_password, salt, 1 as isMailPresent, id from users.customers where mail=@mail
+   select encry_password, salt, isMailPresent, id, @total_quantity as quantity  from @OUTPUT1;
    return
   END
  insert into @OUTPUT(isMailPresent) values(0)
@@ -16,7 +28,11 @@ END
 create function users.getUser(@userid bigint)
 returns TABLE
 AS
-return (SELECT * FROM users.customers WHERE id=@userid)
+return (
+    SELECT * from
+    (SELECT * FROM users.customers WHERE id=@userid) uc
+    LEFT JOIN (SELECT SUM(quantity) as cart_quantity, user_id FROM users.customers_cart group by user_id having user_id=@userid) ucc on uc.id = ucc.user_id
+)
 
 -----------------------------------------------------------------------------------------------------------------------
 create function products.getProductsByName(@name varchar(100), @user_id bigint)
